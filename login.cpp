@@ -50,5 +50,8 @@ void HachiServer::on_message(connection_hdl hdl, websocketpp_server::message_ptr
         case GET_USER:
             cout << "Get user" << endl;
             break;
+        case CREATE_USER:
+            cout << "Create user" << endl;
+            break;
     }
 }
