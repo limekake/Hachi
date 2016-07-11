@@ -1,7 +1,3 @@
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-
 #ifdef SERVER_HANDLER_MAP
 #include "map.hpp"
 #endif

@@ -3,15 +3,14 @@
 #include <rapidjson/document.h>
 #include <iostream>
 #include <map>
-#include <exception>
 #include "network.hpp"
 #include "login.hpp"
 
 typedef websocketpp::server<websocketpp::config::asio> websocketpp_server;
 
 using websocketpp::connection_hdl;
-using websocketpp::lib::placeholders::_1;
-using websocketpp::lib::placeholders::_2;
+using placeholders::_1;
+using placeholders::_2;
 using websocketpp::lib::bind;
 using namespace std;
 
@@ -24,7 +23,7 @@ HachiServer::HachiServer()
 
 void HachiServer::on_open(connection_hdl hdl)
 {
-    connection_data con;
+    connection_session con;
     con.sessionid = _next_sessionid++;
 
     _connections[hdl] = con;
@@ -32,7 +31,7 @@ void HachiServer::on_open(connection_hdl hdl)
 
 void HachiServer::on_close(connection_hdl hdl)
 {
-    connection_data& data = get_connection(hdl);
+	auto& data = get_connection(hdl);
 
     cout << "Closing connection " << data.name << " with sessionid " << data.sessionid << endl;
 
@@ -41,7 +40,7 @@ void HachiServer::on_close(connection_hdl hdl)
 
 void HachiServer::on_message(connection_hdl hdl, websocketpp_server::message_ptr msg)
 {
-    connection_data& con = get_connection(hdl);
+	auto& con = get_connection(hdl);
 
     rapidjson::Document message;
     message.Parse(msg->get_payload().c_str());

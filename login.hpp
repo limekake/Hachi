@@ -3,8 +3,6 @@
 
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
-#include <iostream>
-#include <map>
 #include "network.hpp"
 
 typedef websocketpp::server<websocketpp::config::asio> websocketpp_server;
@@ -16,9 +14,9 @@ class HachiServer : public HachiNetwork
 {
 public:
     HachiServer();
-    void on_open(connection_hdl hdl);
-    void on_close(connection_hdl hdl);
-    void on_message(connection_hdl hdl, websocketpp_server::message_ptr msg);
+    void on_open(connection_hdl hdl) override;
+    void on_close(connection_hdl hdl) override;
+    void on_message(connection_hdl hdl, websocketpp_server::message_ptr msg) override;
 };
 
 enum ACTION

@@ -29,3 +29,5 @@
 *.app
 *.vcxproj
 Hachi
+*.filters
+/*.user

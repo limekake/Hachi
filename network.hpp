@@ -6,14 +6,13 @@
 #include <websocketpp/server.hpp>
 #include <iostream>
 #include <map>
-#include <exception>
 
 typedef websocketpp::server<websocketpp::config::asio> websocketpp_server;
 
 using websocketpp::connection_hdl;
 using namespace std;
 
-struct connection_data {
+struct connection_session {
     int sessionid;
     string name;
 };
@@ -21,7 +20,9 @@ struct connection_data {
 class HachiNetwork
 {
 public:
-    HachiNetwork() : _next_sessionid(1)
+	virtual ~HachiNetwork() {}
+
+	HachiNetwork() : _next_sessionid(1)
     {
         _server.init_asio();
     }
@@ -38,7 +39,7 @@ public:
     virtual void on_close(connection_hdl hdl) = 0;
     virtual void on_message(connection_hdl hdl, websocketpp_server::message_ptr msg) = 0;
 
-    connection_data& get_connection(connection_hdl hdl)
+    connection_session& get_connection(connection_hdl hdl)
     {
         auto it = _connections.find(hdl);
         if (it == _connections.end()) {
@@ -50,7 +51,7 @@ public:
 protected:
     int _next_sessionid;
     websocketpp_server _server;
-    map<connection_hdl, connection_data, std::owner_less<connection_hdl>> _connections;
+    map<connection_hdl, connection_session, std::owner_less<connection_hdl>> _connections;
 };
 
 #endif
