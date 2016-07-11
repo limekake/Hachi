@@ -59,7 +59,7 @@ void HachiServer::auth_user(connection_hdl hdl, const char* u, const char* p)
     auto& session = get_connection(hdl);
 
     auto query = "SELECT username, password from hachi_login WHERE username=" + string(u) + " AND password=" + string(p);
-    PGresult *result = PQexec(conn, query);
+    PGresult *result = PQexec(conn, query.c_str());
     string username = PQgetvalue(result, 0, 0);
     cout << PQgetvalue(result, 0, 0) << " has been authenticated" << endl;
     session.name = username;
