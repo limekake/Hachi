@@ -4,6 +4,7 @@
 
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
+#include <postgresql/libpq-fe.h>
 #include <iostream>
 #include <map>
 
@@ -25,6 +26,11 @@ public:
 	HachiNetwork() : _next_sessionid(1)
     {
         _server.init_asio();
+        conn = PQconnectdb("dbname=hachi_db user=hachi_db_worker password=hachi.9308");
+        if (PQstatus(conn) != CONNECTION_OK)
+        {
+            cout << "ERROR POSTGRES CONNECT" << endl;
+        }
     }
 
     void run()
@@ -52,6 +58,7 @@ protected:
     int _next_sessionid;
     websocketpp_server _server;
     map<connection_hdl, connection_session, std::owner_less<connection_hdl>> _connections;
+    PGconn *conn;
 };
 
 #endif

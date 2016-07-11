@@ -19,7 +19,7 @@ public:
     void on_message(connection_hdl hdl, websocketpp_server::message_ptr msg) override;
 
 private:
-    void auth_user();
+    void auth_user(connection_hdl hdl, const char* username, const char* password);
 };
 
 enum ACTION
