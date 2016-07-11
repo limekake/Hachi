@@ -3,6 +3,7 @@
 #include <rapidjson/document.h>
 #include <iostream>
 #include <map>
+#include <postgresql/libpq-fe.h>
 #include "network.hpp"
 #include "login.hpp"
 
@@ -47,10 +48,30 @@ void HachiServer::on_message(connection_hdl hdl, websocketpp_server::message_ptr
     switch (message["action"].GetInt())
     {
         case GET_USER:
-            cout << "Get user" << endl;
+            auth_user();
             break;
         case CREATE_USER:
             cout << "Create user" << endl;
             break;
+    }
+}
+void HachiServer::auth_user()
+{
+    PGconn *conn = PQconnectdb("dbname=hachi_db user=hachi_db_worker password=hachi.9308");
+    if (PQstatus(conn) != CONNECTION_OK)
+    {
+        cout << "ERROR POSTGRES CONNECT" << endl;
+    }
+
+    PGresult *result = PQexec(conn, "SELECT * from hachi_login");
+    int nfields = PQnfields(result);
+    int ntuples = PQntuples(result);
+
+    for(int i = 0; i < ntuples; i++)
+    {
+        for(int j = 0; j < nfields; j++)
+        {
+            cout << "[" << i << "," << j << "] " << PQgetvalue(result, i, j) << endl;
+        }
     }
 }

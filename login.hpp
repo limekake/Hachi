@@ -17,6 +17,9 @@ public:
     void on_open(connection_hdl hdl) override;
     void on_close(connection_hdl hdl) override;
     void on_message(connection_hdl hdl, websocketpp_server::message_ptr msg) override;
+
+private:
+    void auth_user();
 };
 
 enum ACTION
