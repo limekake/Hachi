@@ -70,6 +70,7 @@ void HachiServer::auth_user(connection_hdl hdl, const char* u, const char* p)
 void HachiServer::chat_message(connection_hdl hdl, websocketpp_server::message_ptr msg, const char* c_m)
 {
     auto& session = get_connection(hdl);
+    websocketpp_server::message_ptr message_packet;
 
     if (!session.auth)
     {
@@ -77,16 +78,18 @@ void HachiServer::chat_message(connection_hdl hdl, websocketpp_server::message_p
         for (auto iter = _connections.begin(); iter != _connections.end(); ++iter)
         {
             auto handler = iter->first;
-            msg->set_payload(not_auth_message);
-            _server.send(handler, msg);
+            message_packet->set_payload(not_auth_message);
+            _server.send(handler, message_packet);
         }
     }
-
-    string chat_message = "[" + session.name + "]: " + c_m;
-    for (auto iter = _connections.begin(); iter != _connections.end(); ++iter)
+    else
     {
-        auto handler = iter->first;
-        msg->set_payload(chat_message);
-        _server.send(handler, msg);
-    }
+        string chat_message = "[" + session.name + "]: " + c_m;
+        for (auto iter = _connections.begin(); iter != _connections.end(); ++iter)
+        {
+            auto handler = iter->first;
+            message_packet->set_payload(chat_message);
+            _server.send(handler, message_packet);
+        }
+    }    
 }

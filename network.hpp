@@ -58,6 +58,7 @@ public:
 protected:
     int _next_sessionid;
     websocketpp_server _server;
+    websocketpp_server::message_ptr message_ptr_template;
     map<connection_hdl, connection_session, std::owner_less<connection_hdl>> _connections;
     PGconn *conn;
 };
