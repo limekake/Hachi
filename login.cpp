@@ -49,8 +49,8 @@ void HachiServer::on_message(connection_hdl hdl, websocketpp_server::message_ptr
             message_ptr_template = msg;
             auth_user(hdl, message["username"].GetString(), message["password"].GetString());
             break;
-        case CHAT_MESSAGE:
-            chat_message(hdl, msg, message["chat_message"].GetString());
+        case MESSAGE_CHAT:
+            chat_message(hdl, message["chat"].GetString());
             break;
     }
 }
@@ -73,10 +73,15 @@ void HachiServer::chat_message(connection_hdl hdl, const char* c_m)
     auto& session = get_connection(hdl);
 
     string chat_message = "[" + session.name + "]: " + c_m;
+    broadcast_send(chat_message.c_str());
+}
+
+void HachiServer::broadcast_send(const char* msg)
+{
     for (auto iter = _connections.begin(); iter != _connections.end(); ++iter)
     {
         auto handler = iter->first;
-        message_ptr_template->set_payload(chat_message);
+        message_ptr_template->set_payload(msg);
         _server.send(handler, message_ptr_template);
     }
 }

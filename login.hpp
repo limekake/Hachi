@@ -21,6 +21,8 @@ public:
 private:
     void auth_user(connection_hdl hdl, const char* username, const char* password);
     void chat_message(connection_hdl hdl, const char* c_m);
+
+    void broadcast_send(const char* msg);
 };
 
 enum ACTION
@@ -29,7 +31,7 @@ enum ACTION
     CREATE_USER,
     DELETE_USER,
     UPDATE_USER,
-    CHAT_MESSAGE,
+    MESSAGE_CHAT,
 };
 
 #endif
