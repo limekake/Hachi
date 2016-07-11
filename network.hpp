@@ -15,6 +15,7 @@ using namespace std;
 
 struct connection_session {
     int sessionid;
+    bool auth = false;
     string name;
 };
 
