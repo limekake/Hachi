@@ -20,7 +20,7 @@ public:
 
 private:
     void auth_user(connection_hdl hdl, const char* username, const char* password);
-    void chat_message(connection_hdl hdl, websocketpp_server::message_ptr msg, const char* c_m);
+    void chat_message(connection_hdl hdl, const char* c_m);
 };
 
 enum ACTION

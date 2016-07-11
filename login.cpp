@@ -46,6 +46,7 @@ void HachiServer::on_message(connection_hdl hdl, websocketpp_server::message_ptr
     switch (message["action"].GetInt())
     {
         case GET_USER:
+            message_ptr_template = msg;
             auth_user(hdl, message["username"].GetString(), message["password"].GetString());
             break;
         case CHAT_MESSAGE:
@@ -67,29 +68,15 @@ void HachiServer::auth_user(connection_hdl hdl, const char* u, const char* p)
     session.name = username;
 }
 
-void HachiServer::chat_message(connection_hdl hdl, websocketpp_server::message_ptr msg, const char* c_m)
+void HachiServer::chat_message(connection_hdl hdl, const char* c_m)
 {
     auto& session = get_connection(hdl);
-    websocketpp_server::message_ptr message_packet;
 
-    if (!session.auth)
+    string chat_message = "[" + session.name + "]: " + c_m;
+    for (auto iter = _connections.begin(); iter != _connections.end(); ++iter)
     {
-        string not_auth_message = "Connection id " + to_string(session.sessionid) + " is not authenticated";
-        for (auto iter = _connections.begin(); iter != _connections.end(); ++iter)
-        {
-            auto handler = iter->first;
-            message_packet->set_payload(not_auth_message);
-            _server.send(handler, message_packet);
-        }
+        auto handler = iter->first;
+        message_ptr_template->set_payload(chat_message);
+        _server.send(handler, message_ptr_template);
     }
-    else
-    {
-        string chat_message = "[" + session.name + "]: " + c_m;
-        for (auto iter = _connections.begin(); iter != _connections.end(); ++iter)
-        {
-            auto handler = iter->first;
-            message_packet->set_payload(chat_message);
-            _server.send(handler, message_packet);
-        }
-    }    
 }
