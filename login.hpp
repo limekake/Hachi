@@ -1,6 +1,3 @@
-#ifndef LOGIN_SERVER
-#define LOGIN_SERVER
-
 #include <uWS/uWS.h>
 #include "network.hpp"
 
@@ -29,5 +26,3 @@ enum ACTION
     UPDATE_USER,
     MESSAGE_CHAT,
 };
-
-#endif

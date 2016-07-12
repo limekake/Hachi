@@ -1,16 +1,15 @@
 #ifndef NETWORKING
+#define NETWORKING
+#define THREADS 4
 #define DISPATCH_SERVER_PORT 8081
 #define LOGIN_SERVER_PORT 8082
 
-#ifdef SERVER_HANDLER_DISPATCH
+#ifdef DISPATCH_SERVER
 #define CURRENT_PORT DISPATCH_SERVER_PORT
 #endif
-#ifdef SERVER_HANDLER_LOGIN
+#ifdef LOGIN_SERVER
 #define CURRENT_PORT LOGIN_SERVER_PORT
 #endif
-
-#define NETWORKING
-#define THREADS 4
 
 #include <iostream>
 #include <uWS/uWS.h>

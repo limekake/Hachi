@@ -1,7 +1,7 @@
-#ifdef SERVER_HANDLER_DISPATCH
+#ifdef DISPATCH_SERVER
 #include "dispatch.hpp"
 #endif
-#ifdef SERVER_HANDLER_LOGIN
+#ifdef LOGIN_SERVER
 #include "login.hpp"
 #endif
 
