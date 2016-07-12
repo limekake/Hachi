@@ -16,8 +16,8 @@ HachiServer::HachiServer()
 void HachiServer::on_connect(WebSocket socket)
 {
     connection_session new_session;
-    new_session.sessionid = _next_sessionid++;
-    _connection_pool[socket] = new_session;
+    new_session.sessionid = reinterpret_cast<uint32_t>(&socket);
+    _connection_pool[new_session.sessionid] = new_session;
     cout << "[Connection] New Client: " << new_session.sessionid << endl;
 }
 
@@ -27,7 +27,7 @@ void HachiServer::on_disconnect(WebSocket socket)
 
     cout << "[Connection] Disconnecting Client: " << session->sessionid << endl;
 
-    _connection_pool.erase(socket);
+    _connection_pool.erase(session->sessionid);
 }
 
 void HachiServer::on_message(WebSocket socket, char *message, size_t length, OpCode opCode)
