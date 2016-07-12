@@ -1,6 +1,5 @@
 #include <iostream>
 #include <uWS/uWS.h>
-#include <rapidjson/document.h>
 #include "network.hpp"
 #include "login.hpp"
 
@@ -33,6 +32,4 @@ void HachiServer::on_disconnect(WebSocket socket)
 
 void HachiServer::on_message(WebSocket socket, char *message, size_t length, OpCode opCode)
 {
-    rapidjson::Document message;
-    //message.Parse(msg->get_payload().c_str());
 }
