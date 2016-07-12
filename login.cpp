@@ -32,4 +32,6 @@ void HachiServer::on_disconnect(WebSocket socket)
 
 void HachiServer::on_message(WebSocket socket, char *message, size_t length, OpCode opCode)
 {
+    auto session = get_session(socket);
+    cout << "[Message] Client " << session->sessionid << " sent message" << endl;
 }
