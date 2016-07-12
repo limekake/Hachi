@@ -9,7 +9,7 @@ using namespace std;
 
 HachiServer::HachiServer()
 {
-    _login_server_ws = easywsclient::WebSocket::from_url("ws://localhost:8092");
+    _login_server_ws = easywsclient::WebSocket::from_url("ws://localhost:" + LOGIN_SERVER_PORT);
     cout << "LOGIN SERVER CONNECTED" << endl;
 
     _server.onConnection(bind(&HachiServer::on_connect, this, placeholders::_1));
