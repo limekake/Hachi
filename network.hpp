@@ -37,7 +37,7 @@ public:
 
     connection_session* get_session(WebSocket socket)
     {
-        auto session = _connection_pool.find(reinterpret_cast<uint32_t>(&socket));
+        auto session = _connection_pool.find(socket);
 
         if (session == _connection_pool.end())
         {
@@ -49,7 +49,7 @@ public:
 
 protected:
     int _next_sessionid;
-    map<uint32_t, connection_session> _connection_pool;
+    map<WebSocket, connection_session> _connection_pool;
     Server _server;
 };
 
