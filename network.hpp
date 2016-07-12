@@ -15,12 +15,11 @@
 #include <uWS/uWS.h>
 #include <map>
 
-using namespace uWS;
 using namespace std;
 
 struct connection_session {
     int sessionid;
-    WebSocket socket;
+    uWS::WebSocket socket;
     string name;
 };
 
@@ -39,12 +38,12 @@ public:
         _server.run();
     }
 
-    virtual void on_connect(WebSocket socket) = 0;
-    virtual void on_disconnect(WebSocket socket) = 0;
-    virtual void on_message(WebSocket socket, char *message, size_t length, OpCode opCode) = 0;
+    virtual void on_connect(uWS::WebSocket socket) = 0;
+    virtual void on_disconnect(uWS::WebSocket socket) = 0;
+    virtual void on_message(uWS::WebSocket socket, char *message, size_t length, uWS::OpCode opCode) = 0;
 
 protected:
-    Server _server;
+    uWS::Server _server;
 };
 
 enum SERVER_TYPE

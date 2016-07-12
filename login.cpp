@@ -4,7 +4,6 @@
 #include "network.hpp"
 #include "login.hpp"
 
-using namespace uWS;
 using namespace std;
 
 HachiServer::HachiServer()
@@ -14,7 +13,7 @@ HachiServer::HachiServer()
     _server.onMessage(bind(&HachiServer::on_message, this, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4));
 }
 
-void HachiServer::on_connect(WebSocket socket)
+void HachiServer::on_connect(uWS::WebSocket socket)
 {
     switch (socket.getAddress().port)
     {
@@ -25,12 +24,12 @@ void HachiServer::on_connect(WebSocket socket)
     }
 }
 
-void HachiServer::on_disconnect(WebSocket socket)
+void HachiServer::on_disconnect(uWS::WebSocket socket)
 {
     cout << "[LOGIN] Disconnect: " << socket.getAddress().address << endl;
 }
 
-void HachiServer::on_message(WebSocket socket, char *message, size_t length, OpCode opCode)
+void HachiServer::on_message(uWS::WebSocket socket, char *message, size_t length, uWS::OpCode opCode)
 {
     rapidjson::Document json_message;
     json_message.Parse(message);
