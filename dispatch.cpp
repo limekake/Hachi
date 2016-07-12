@@ -1,3 +1,6 @@
+#define xstr(a) str(a)
+#define str(a) #a
+
 #include <iostream>
 #include <uWS/uWS.h>
 #include <rapidjson/document.h>
@@ -9,7 +12,7 @@ using namespace std;
 
 HachiServer::HachiServer()
 {
-    _login_server_ws = easywsclient::WebSocket::from_url("ws://localhost:" + LOGIN_SERVER_PORT);
+    _login_server_ws = easywsclient::WebSocket::from_url("ws://localhost:" xstr(LOGIN_SERVER_PORT));
     cout << "LOGIN SERVER CONNECTED" << endl;
 
     _server.onConnection(bind(&HachiServer::on_connect, this, placeholders::_1));
