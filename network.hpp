@@ -1,16 +1,13 @@
 #ifndef NETWORKING
 #define NETWORKING
 #define PORT 8081
+#define THREADS 4
 
-#include <websocketpp/config/asio_no_tls.hpp>
-#include <websocketpp/server.hpp>
-#include <postgresql/libpq-fe.h>
 #include <iostream>
+#include <uWS/uWS.h>
 #include <map>
 
-typedef websocketpp::server<websocketpp::config::asio> websocketpp_server;
-
-using websocketpp::connection_hdl;
+using namespace uWS;
 using namespace std;
 
 struct connection_session {
@@ -24,43 +21,36 @@ class HachiNetwork
 public:
 	virtual ~HachiNetwork() {}
 
-	HachiNetwork() : _next_sessionid(1)
+	HachiNetwork() : _next_sessionid(1), _server(PORT)
     {
-        _server.init_asio();
-        conn = PQconnectdb("dbname=hachi_db user=hachi_db_worker password=hachi.9308");
-        if (PQstatus(conn) != CONNECTION_OK)
-        {
-            cout << "ERROR POSTGRES CONNECT" << endl;
-        }
     }
 
     void run()
     {
         cout << "Server started on port " << PORT << endl;
-        _server.listen(PORT);
-        _server.start_accept();
         _server.run();
     }
 
-    virtual void on_open(connection_hdl hdl) = 0;
-    virtual void on_close(connection_hdl hdl) = 0;
-    virtual void on_message(connection_hdl hdl, websocketpp_server::message_ptr msg) = 0;
+    virtual void on_connect(WebSocket socket) = 0;
+    virtual void on_disconnect(WebSocket socket) = 0;
+    virtual void on_message(WebSocket socket, char *message, size_t length, OpCode opCode) = 0;
 
-    connection_session& get_connection(connection_hdl hdl)
+    connection_session* get_session(WebSocket socket)
     {
-        auto it = _connections.find(hdl);
-        if (it == _connections.end()) {
-            throw invalid_argument("No data avaliable for session");
+        auto session = _connection_pool.find(socket);
+
+        if (session == _connection_pool.end())
+        {
+            cout << "No session found!" << endl;
+            return nullptr;
         }
-        return it->second;
+        return &(session->second);
     }
 
 protected:
     int _next_sessionid;
-    websocketpp_server _server;
-    websocketpp_server::message_ptr message_ptr_template;
-    map<connection_hdl, connection_session, std::owner_less<connection_hdl>> _connections;
-    PGconn *conn;
+    map<WebSocket, connection_session> _connection_pool;
+    Server _server;
 };
 
 #endif

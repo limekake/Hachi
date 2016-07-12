@@ -1,28 +1,19 @@
 #ifndef LOGIN_SERVER
 #define LOGIN_SERVER
 
-#include <websocketpp/config/asio_no_tls.hpp>
-#include <websocketpp/server.hpp>
 #include "network.hpp"
+#include <uWS/uWS.h>
 
-typedef websocketpp::server<websocketpp::config::asio> websocketpp_server;
-
-using websocketpp::connection_hdl;
+using namespace uWS;
 using namespace std;
 
 class HachiServer : public HachiNetwork
 {
 public:
     HachiServer();
-    void on_open(connection_hdl hdl) override;
-    void on_close(connection_hdl hdl) override;
-    void on_message(connection_hdl hdl, websocketpp_server::message_ptr msg) override;
-
-private:
-    void auth_user(connection_hdl hdl, const char* username, const char* password);
-    void chat_message(connection_hdl hdl, const char* c_m);
-
-    void broadcast_send(const char* msg);
+    void on_connect(WebSocket socket) override;
+    void on_disconnect(WebSocket socket) override;
+    void on_message(WebSocket socket, char *message, size_t length, OpCode opCode) override;
 };
 
 enum ACTION
