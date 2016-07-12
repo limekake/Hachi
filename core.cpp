@@ -1,14 +1,9 @@
-#ifdef SERVER_HANDLER_MAP
-#include "map.hpp"
-#endif
-#ifdef SERVER_HANDLER_CHAR
-#include "char.hpp"
+#ifdef SERVER_HANDLER_DISPATCH
+#include "dispatch.hpp"
 #endif
 #ifdef SERVER_HANDLER_LOGIN
 #include "login.hpp"
 #endif
-
-using namespace std;
 
 int main(int argc, char *argv[])
 {

@@ -1,6 +1,15 @@
 #ifndef NETWORKING
+#define DISPATCH_SERVER_PORT 8081
+#define LOGIN_SERVER_PORT 8082
+
+#ifdef SERVER_HANDLER_DISPATCH
+#define CURRENT_PORT DISPATCH_SERVER_PORT
+#endif
+#ifdef SERVER_HANDLER_LOGIN
+#define CURRENT_PORT LOGIN_SERVER_PORT
+#endif
+
 #define NETWORKING
-#define PORT 8081
 #define THREADS 4
 
 #include <iostream>
@@ -21,13 +30,13 @@ class HachiNetwork
 public:
 	virtual ~HachiNetwork() {}
 
-	HachiNetwork() : _next_sessionid(1), _server(PORT)
+	HachiNetwork() : _server(CURRENT_PORT)
     {
     }
 
     void run()
     {
-        cout << "Server started on port " << PORT << endl;
+        cout << "Server started on port " << CURRENT_PORT << endl;
         _server.run();
     }
 
@@ -35,22 +44,14 @@ public:
     virtual void on_disconnect(WebSocket socket) = 0;
     virtual void on_message(WebSocket socket, char *message, size_t length, OpCode opCode) = 0;
 
-    connection_session* get_session(WebSocket socket)
-    {
-        auto session = _connection_pool.find(socket);
-
-        if (session == _connection_pool.end())
-        {
-            cout << "No session found!" << endl;
-            return nullptr;
-        }
-        return &(session->second);
-    }
-
 protected:
-    int _next_sessionid;
-    map<WebSocket, connection_session> _connection_pool;
     Server _server;
+};
+
+enum SERVER_TYPE
+{
+    DISPATCH = 1,
+    LOGIN,
 };
 
 #endif

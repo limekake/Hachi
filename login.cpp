@@ -1,5 +1,6 @@
 #include <iostream>
 #include <uWS/uWS.h>
+#include <rapidjson/document.h>
 #include "network.hpp"
 #include "login.hpp"
 
@@ -15,23 +16,29 @@ HachiServer::HachiServer()
 
 void HachiServer::on_connect(WebSocket socket)
 {
-    connection_session new_session;
-    new_session.sessionid = _next_sessionid++;
-    _connection_pool[socket] = new_session;
-    cout << "[Connection] New Client: " << new_session.sessionid << endl;
+    switch (socket.getAddress().port)
+    {
+    case DISPATCH_SERVER_PORT:
+        _dispatch_server = socket;
+        cout << "[LOGIN] Dispatch server connected" << endl;
+        break;
+    }
 }
 
 void HachiServer::on_disconnect(WebSocket socket)
 {
-    auto session = get_session(socket);
-
-    cout << "[Connection] Disconnecting Client: " << session->sessionid << endl;
-
-    _connection_pool.erase(socket);
+    cout << "[LOGIN] Disconnect: " << socket.getAddress().address << endl;
 }
 
 void HachiServer::on_message(WebSocket socket, char *message, size_t length, OpCode opCode)
 {
-    auto session = get_session(socket);
-    cout << "[Message] Client " << session->sessionid << " sent message" << endl;
+    rapidjson::Document json_message;
+    json_message.Parse(message);
+
+    process_message(json_message["PAYLOAD"].GetString());
+}
+
+void HachiServer::process_message(const char *message)
+{
+    cout << "[LOGIN] Message: " << message << endl;
 }

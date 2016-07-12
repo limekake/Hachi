@@ -1,8 +1,8 @@
 #ifndef LOGIN_SERVER
 #define LOGIN_SERVER
 
-#include "network.hpp"
 #include <uWS/uWS.h>
+#include "network.hpp"
 
 using namespace uWS;
 using namespace std;
@@ -14,6 +14,11 @@ public:
     void on_connect(WebSocket socket) override;
     void on_disconnect(WebSocket socket) override;
     void on_message(WebSocket socket, char *message, size_t length, OpCode opCode) override;
+
+private:
+    static void process_message(const char *message);
+
+    WebSocket _dispatch_server;
 };
 
 enum ACTION
