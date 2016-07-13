@@ -38,7 +38,7 @@ void HachiServer::on_disconnect(uWS::WebSocket socket)
 
 void HachiServer::on_message(uWS::WebSocket socket, char *message, size_t length, uWS::OpCode opCode)
 {
-    process_message(message);
+    process_message(string(message, length).c_str());
 }
 
 void HachiServer::process_message(const char *message)

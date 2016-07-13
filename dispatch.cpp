@@ -49,24 +49,26 @@ void HachiServer::on_disconnect(uWS::WebSocket socket)
 
 void HachiServer::on_message(uWS::WebSocket socket, char *message, size_t length, uWS::OpCode opCode)
 {
+    auto message_data = string(message, length);
     cout << "[DISPATCH] Address: " << socket.getAddress().address << endl;
-    cout << message << endl;
 
-    //auto session = get_session(socket);
-    //if (!session->auth)
-    //{
-    //    auto pass_message = new char[sizeof(REQUEST_LOGIN)];
-    //    REQUEST_LOGIN login_packet;
-    //    login_packet.session_id = session->session_id;
-    //    strncpy(login_packet.username, "administrator", sizeof(login_packet.username));
-    //    memcpy(static_cast<void*>(pass_message), static_cast<void*>(&login_packet), sizeof(REQUEST_LOGIN));
+    auto x = 0;
 
-    //    _login_server_ws->send(pass_message);
-    //    _login_server_ws->poll();
-    //}
-    //else
-    //{
-    //    _map_server_ws->send(message);
-    //    _map_server_ws->poll();
-    //}
+    auto session = get_session(socket);
+    if (!session->auth && x == 0)
+    {
+        auto pass_message = new char[sizeof(REQUEST_LOGIN)];
+        REQUEST_LOGIN login_packet;
+        login_packet.session_id = session->session_id;
+        strncpy(login_packet.username, "administrator", sizeof(login_packet.username));
+        memcpy(static_cast<void*>(pass_message), static_cast<void*>(&login_packet), sizeof(REQUEST_LOGIN));
+
+        _login_server_ws->send(pass_message);
+        _login_server_ws->poll();
+    }
+    else
+    {
+        //_map_server_ws->send(message_data);
+        //_map_server_ws->poll();
+    }
 }
