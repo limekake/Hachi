@@ -1,6 +1,7 @@
 #ifndef DISPATCH_SERVER_HEADER
 #define DISPATCH_SERVER_HEADER
 
+#include <iostream>
 #include <uWS/uWS.h>
 #include "easywsclient/easywsclient.hpp"
 #include "network.hpp"
