@@ -55,7 +55,7 @@ void HachiServer::on_message(uWS::WebSocket socket, char *message, size_t length
     if (!session->auth)
     {
         REQUEST_LOGIN login_packet;
-        string("administrator").copy(login_packet.username, sizeof(login_packet.username));
+        strncpy(login_packet.username, "administrator", sizeof(login_packet.username));
         memcpy(pass_message, &login_packet, sizeof(REQUEST_LOGIN));
 
         _login_server_ws->send(pass_message);
