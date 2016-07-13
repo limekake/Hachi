@@ -51,7 +51,7 @@ void HachiServer::process_message(const char *message)
     RESPONSE_LOGIN login_response;
     login_response.session_id = login_request.session_id;
     auto response_message = new char[sizeof(RESPONSE_LOGIN)];
-    memcpy(&login_response, response_message, sizeof(RESPONSE_LOGIN));
+    memcpy(static_cast<void*>(&login_response), static_cast<void*>(response_message), sizeof(RESPONSE_LOGIN));
 
     _dispatch_server.send(response_message, sizeof(response_message), uWS::OpCode::BINARY);
 }
