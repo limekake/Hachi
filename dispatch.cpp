@@ -26,7 +26,7 @@ HachiServer::HachiServer() : HachiNetwork(DISPATCH_SERVER_PORT)
 
 void HachiServer::run()
 {
-    cout << "DISPATCH SERVER STARTED ON PORT " << LOGIN_SERVER_PORT << endl;
+    cout << "DISPATCH SERVER STARTED ON PORT " << DISPATCH_SERVER_PORT << endl;
     _server.run();
 }
 

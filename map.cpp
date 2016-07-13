@@ -16,7 +16,7 @@ HachiServer::HachiServer() : HachiNetwork(MAP_SERVER_PORT)
 
 void HachiServer::run()
 {
-    cout << "MAP SERVER STARTED ON PORT " << LOGIN_SERVER_PORT << endl;
+    cout << "MAP SERVER STARTED ON PORT " << MAP_SERVER_PORT << endl;
     _server.run();
 }
 
