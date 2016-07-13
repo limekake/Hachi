@@ -65,6 +65,7 @@ void HachiServer::on_message(uWS::WebSocket socket, char *message, size_t length
 
         _login_server_ws->send(pass_message);
         _login_server_ws->poll();
+        x++;
     }
     else
     {
