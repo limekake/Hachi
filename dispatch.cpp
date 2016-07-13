@@ -2,6 +2,7 @@
 #define str(a) #a
 
 #include <iostream>
+#include <cstring>
 #include <uWS/uWS.h>
 #include "easywsclient/easywsclient.hpp"
 #include "dispatch.hpp"

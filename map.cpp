@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 #include <uWS/uWS.h>
 #include "network.hpp"
 #include "map.hpp"
