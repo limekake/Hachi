@@ -3,7 +3,7 @@
 #define THREADS 4
 #define DISPATCH_SERVER_PORT 8081
 #define LOGIN_SERVER_PORT 8082
-#define MAP_SERVER_PORT 8082
+#define MAP_SERVER_PORT 8083
 
 #include <uWS/uWS.h>
 
