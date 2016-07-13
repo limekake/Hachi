@@ -5,36 +5,15 @@
 #define LOGIN_SERVER_PORT 8082
 #define MAP_SERVER_PORT 8082
 
-#ifdef DISPATCH_SERVER
-#define CURRENT_PORT DISPATCH_SERVER_PORT
-#endif
-#ifdef LOGIN_SERVER
-#define CURRENT_PORT LOGIN_SERVER_PORT
-#endif
-#ifdef LOGIN_SERVER
-#define CURRENT_PORT MAP_SERVER_PORT
-#endif
-
-#include <iostream>
 #include <uWS/uWS.h>
-
-using namespace std;
 
 class HachiNetwork
 {
 public:
-	virtual ~HachiNetwork() {}
+    explicit HachiNetwork(int port) : _server(port) {}
+    virtual ~HachiNetwork() {}
 
-	HachiNetwork() : _server(CURRENT_PORT)
-    {
-    }
-
-    void run()
-    {
-        cout << "Server started on port " << CURRENT_PORT << endl;
-        _server.run();
-    }
-
+    virtual void run() = 0;
     virtual void on_connect(uWS::WebSocket socket) = 0;
     virtual void on_disconnect(uWS::WebSocket socket) = 0;
     virtual void on_message(uWS::WebSocket socket, char *message, size_t length, uWS::OpCode opCode) = 0;
