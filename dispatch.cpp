@@ -15,6 +15,9 @@ HachiServer::HachiServer()
     _login_server_ws = easywsclient::WebSocket::from_url("ws://localhost:" xstr(LOGIN_SERVER_PORT));
     cout << "LOGIN SERVER CONNECTED" << endl;
 
+    _map_server_ws = easywsclient::WebSocket::from_url("ws://localhost:" xstr(MAP_SERVER_PORT));
+    cout << "MAP SERVER CONNECTED" << endl;
+
     _server.onConnection(bind(&HachiServer::on_connect, this, placeholders::_1));
     _server.onDisconnection(bind(&HachiServer::on_disconnect, this, placeholders::_1));
     _server.onMessage(bind(&HachiServer::on_message, this, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4));
@@ -46,7 +49,7 @@ void HachiServer::on_message(uWS::WebSocket socket, char *message, size_t length
     switch (endpoint)
     {
     case SERVER_TYPE::DISPATCH:
-        process_message(message);
+        process_message(json_message["PAYLOAD"].GetString());
         break;
     case SERVER_TYPE::LOGIN:
         _login_server_ws->send(message);
@@ -55,7 +58,7 @@ void HachiServer::on_message(uWS::WebSocket socket, char *message, size_t length
     }
 }
 
-void HachiServer::process_message(char *message)
+void HachiServer::process_message(const char *message)
 {
     cout << "[DISPATCH] Message: " << message << endl;
 }

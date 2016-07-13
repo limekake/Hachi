@@ -25,9 +25,10 @@ private:
         return &(session->second);
     }
 
-    static void process_message(char *message);
+    static void process_message(const char *message);
 
     easywsclient::WebSocket::pointer _login_server_ws;
+    easywsclient::WebSocket::pointer _map_server_ws;
     int _next_sessionid;
     map<uWS::WebSocket, connection_session> _connection_pool;
 };

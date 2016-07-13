@@ -3,12 +3,16 @@
 #define THREADS 4
 #define DISPATCH_SERVER_PORT 8081
 #define LOGIN_SERVER_PORT 8082
+#define MAP_SERVER_PORT 8082
 
 #ifdef DISPATCH_SERVER
 #define CURRENT_PORT DISPATCH_SERVER_PORT
 #endif
 #ifdef LOGIN_SERVER
 #define CURRENT_PORT LOGIN_SERVER_PORT
+#endif
+#ifdef LOGIN_SERVER
+#define CURRENT_PORT MAP_SERVER_PORT
 #endif
 
 #include <iostream>
@@ -50,6 +54,7 @@ enum SERVER_TYPE
 {
     DISPATCH = 1,
     LOGIN,
+    MAP,
 };
 
 #endif
