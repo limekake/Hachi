@@ -1,8 +1,8 @@
 #include <iostream>
 #include <uWS/uWS.h>
-#include <rapidjson/document.h>
 #include "network.hpp"
 #include "login.hpp"
+#include "packet.hpp"
 
 using namespace std;
 
@@ -31,13 +31,13 @@ void HachiServer::on_disconnect(uWS::WebSocket socket)
 
 void HachiServer::on_message(uWS::WebSocket socket, char *message, size_t length, uWS::OpCode opCode)
 {
-    rapidjson::Document json_message;
-    json_message.Parse(message);
-
-    process_message(json_message["PAYLOAD"].GetString());
+    process_message(message);
 }
 
 void HachiServer::process_message(const char *message)
 {
-    cout << "[LOGIN] Message: " << message << endl;
+    REQUEST_LOGIN login_request;
+    memcpy(&login_request, message, sizeof(REQUEST_LOGIN));
+
+    cout << "[LOGIN] User: " << login_request.username << endl;
 }

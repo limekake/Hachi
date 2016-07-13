@@ -1,8 +1,8 @@
 #include <iostream>
 #include <uWS/uWS.h>
-#include <rapidjson/document.h>
 #include "network.hpp"
 #include "map.hpp"
+#include "packet.hpp"
 
 using namespace std;
 
@@ -31,13 +31,13 @@ void HachiServer::on_disconnect(uWS::WebSocket socket)
 
 void HachiServer::on_message(uWS::WebSocket socket, char *message, size_t length, uWS::OpCode opCode)
 {
-    rapidjson::Document json_message;
-    json_message.Parse(message);
-
-    process_message(json_message["PAYLOAD"].GetString());
+    process_message(message);
 }
 
 void HachiServer::process_message(const char *message)
 {
-    cout << "[MAP] Message: " << message << endl;
+    REQUEST_MOVE move_packet;
+    memcpy(&move_packet, message, sizeof(REQUEST_MOVE));
+
+    cout << "[MAP] Move: " << move_packet.x << " " << move_packet.y << endl;
 }

@@ -1,8 +1,14 @@
 #include <uWS/uWS.h>
 #include "easywsclient/easywsclient.hpp"
 #include "network.hpp"
+#include <map>
 
 using namespace std;
+
+struct connection_session {
+    uWS::WebSocket socket;
+    bool auth = false;
+};
 
 class HachiServer : public HachiNetwork
 {
@@ -20,12 +26,10 @@ private:
         if (session == _connection_pool.end())
         {
             cout << "No session found!" << endl;
-            return nullptr;
+            throw;
         }
         return &(session->second);
     }
-
-    static void process_message(const char *message);
 
     easywsclient::WebSocket::pointer _login_server_ws;
     easywsclient::WebSocket::pointer _map_server_ws;

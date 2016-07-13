@@ -17,15 +17,8 @@
 
 #include <iostream>
 #include <uWS/uWS.h>
-#include <map>
 
 using namespace std;
-
-struct connection_session {
-    int sessionid;
-    uWS::WebSocket socket;
-    string name;
-};
 
 class HachiNetwork
 {

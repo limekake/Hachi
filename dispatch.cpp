@@ -3,10 +3,10 @@
 
 #include <iostream>
 #include <uWS/uWS.h>
-#include <rapidjson/document.h>
 #include "easywsclient/easywsclient.hpp"
-#include "network.hpp"
 #include "dispatch.hpp"
+#include "network.hpp"
+#include "packet.hpp"
 
 using namespace std;
 
@@ -26,39 +26,37 @@ HachiServer::HachiServer()
 void HachiServer::on_connect(uWS::WebSocket socket)
 {
     connection_session new_session;
-    new_session.sessionid = _next_sessionid++;
     _connection_pool[socket] = new_session;
-    cout << "[DISPATCH] Connect: " << new_session.sessionid << endl;
+    cout << "[DISPATCH] Connect: " << socket.getAddress().address << ":" << socket.getAddress().port << endl;
 }
 
 void HachiServer::on_disconnect(uWS::WebSocket socket)
 {
     auto session = get_session(socket);
 
-    cout << "[DISPATCH] Disconnect: " << session->sessionid << endl;
+    cout << "[DISPATCH] Disconnect: " << socket.getAddress().address << ":" << socket.getAddress().port << endl;
 
     _connection_pool.erase(socket);
 }
 
 void HachiServer::on_message(uWS::WebSocket socket, char *message, size_t length, uWS::OpCode opCode)
 {
-    rapidjson::Document json_message;
-    json_message.Parse(message);
+    cout << socket.getAddress().address << endl;
 
-    auto endpoint = json_message["ENDPOINT"].GetInt();
-    switch (endpoint)
+    auto session = get_session(socket);
+    char* pass_message = nullptr;
+    if (!session->auth)
     {
-    case SERVER_TYPE::DISPATCH:
-        process_message(json_message["PAYLOAD"].GetString());
-        break;
-    case SERVER_TYPE::LOGIN:
-        _login_server_ws->send(message);
-        _login_server_ws->poll();
-        break;
-    }
-}
+        REQUEST_LOGIN login_packet;
+        string("administrator").copy(login_packet.username, sizeof(login_packet.username));
+        memcpy(pass_message, &login_packet, sizeof(REQUEST_LOGIN));
 
-void HachiServer::process_message(const char *message)
-{
-    cout << "[DISPATCH] Message: " << message << endl;
+        _login_server_ws->send(pass_message);
+        _login_server_ws->poll();
+    }
+    else
+    {
+        _map_server_ws->send(message);
+        _map_server_ws->poll();
+    }
 }
