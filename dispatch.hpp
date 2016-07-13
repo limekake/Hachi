@@ -11,6 +11,7 @@ using namespace std;
 
 struct connection_session {
     uWS::WebSocket socket;
+    int session_id;
     bool auth = false;
 };
 
@@ -34,6 +35,19 @@ private:
             throw;
         }
         return &(session->second);
+    }
+
+    connection_session* get_session(int session_id)
+    {
+        typedef map<uWS::WebSocket, connection_session>::iterator it_type;
+        for (auto iterator = _connection_pool.begin(); iterator != _connection_pool.end(); ++iterator)
+        {
+            if (iterator->second.session_id == session_id)
+            {
+                return &(iterator->second);
+            }
+        }
+        return nullptr;
     }
 
     easywsclient::WebSocket::pointer _login_server_ws;
