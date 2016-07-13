@@ -49,7 +49,8 @@ void HachiServer::on_disconnect(uWS::WebSocket socket)
 
 void HachiServer::on_message(uWS::WebSocket socket, char *message, size_t length, uWS::OpCode opCode)
 {
-    cout << socket.getAddress().address << endl;
+    cout << "[DISPATCH] Address: " << socket.getAddress().address << endl;
+    cout << message << endl;
 
     auto session = get_session(socket);
     if (!session->auth)
