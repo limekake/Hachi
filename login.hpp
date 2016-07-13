@@ -1,3 +1,6 @@
+#ifndef LOGIN_SERVER_HEADER
+#define LOGIN_SERVER_HEADER
+
 #include <uWS/uWS.h>
 #include "network.hpp"
 
@@ -16,3 +19,5 @@ private:
 
     uWS::WebSocket _dispatch_server;
 };
+
+#endif

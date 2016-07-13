@@ -1,3 +1,6 @@
+#ifndef DISPATCH_SERVER_HEADER
+#define DISPATCH_SERVER_HEADER
+
 #include <uWS/uWS.h>
 #include "easywsclient/easywsclient.hpp"
 #include "network.hpp"
@@ -36,3 +39,5 @@ private:
     int _next_sessionid;
     map<uWS::WebSocket, connection_session> _connection_pool;
 };
+
+#endif

@@ -4,6 +4,9 @@
 #ifdef LOGIN_SERVER
 #include "login.hpp"
 #endif
+#ifdef MAP_SERVER
+#include "map.hpp"
+#endif
 
 int main(int argc, char *argv[])
 {
