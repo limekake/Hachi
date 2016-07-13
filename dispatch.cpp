@@ -51,7 +51,7 @@ void HachiServer::on_message(uWS::WebSocket socket, char *message, size_t length
     cout << socket.getAddress().address << endl;
 
     auto session = get_session(socket);
-    char* pass_message = nullptr;
+    auto pass_message = new char[sizeof(REQUEST_LOGIN)];
     if (!session->auth)
     {
         REQUEST_LOGIN login_packet;
