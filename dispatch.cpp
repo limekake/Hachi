@@ -57,7 +57,7 @@ void HachiServer::login_message()
     char buffer[64];
     string message;
 
-    while ((recv_size = recv(_login_server_socket, buffer, sizeof(buffer), 0)) > 0)
+    while ((recv_size = recv(_login_server_socket, buffer, 64, 0)) > 0)
     {
         cout << buffer << endl;
         memset(buffer, 0, 64);
@@ -103,15 +103,14 @@ void HachiServer::on_message(uWS::WebSocket socket, char *message, size_t length
     auto session = get_session(socket);
     auto message_data = string(message, length);
 
-    cout << "[DISPATCH] Address: " << socket.getAddress().address << endl;
-
     if (!session->auth)
     {
         auto pass_message = new char[sizeof(REQUEST_LOGIN)];
         REQUEST_LOGIN login_packet;
         login_packet.session_id = session->session_id;
-        strncpy(login_packet.username, "administrator", sizeof(login_packet.username));
+        strncpy(login_packet.username, "administrator", 20);
         memcpy(static_cast<void*>(pass_message), static_cast<void*>(&login_packet), sizeof(REQUEST_LOGIN));
+        cout << login_packet.username << endl;
 
         login_send(pass_message);
     }

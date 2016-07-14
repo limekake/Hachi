@@ -44,7 +44,7 @@ void HachiServer::dispatch_message()
     char buffer[64];
     string message;
 
-    while ((recv_size = recv(_dispatch_server_socket, buffer, sizeof(buffer), 0)) > 0)
+    while ((recv_size = recv(_dispatch_server_socket, buffer, 64, 0)) > 0)
     {
         process_message(buffer);
         memset(buffer, 0, 64);

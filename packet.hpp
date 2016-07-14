@@ -9,7 +9,7 @@ struct RESPONSE_LOGIN
 struct REQUEST_LOGIN
 {
     int session_id;
-    char username[20] = {0};
+    char username[20];
 };
 
 struct REQUEST_MOVE
