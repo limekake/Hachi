@@ -52,11 +52,12 @@ private:
     connection_session* get_session(int session_id)
     {
         typedef map<uWS::WebSocket, connection_session>::iterator it_type;
-        for (auto iterator = _connection_pool.begin(); iterator != _connection_pool.end(); ++iterator)
+        for (auto i : _connection_pool)
         {
-            if (iterator->second.session_id == session_id)
+            cout << i.second.session_id << endl;
+            if (i.second.session_id == session_id)
             {
-                return &(iterator->second);
+                return &(i.second);
             }
         }
         return nullptr;
