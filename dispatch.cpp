@@ -40,7 +40,7 @@ void HachiServer::run()
     cout << "DISPATCH SERVER STARTED ON PORT " << DISPATCH_SERVER_PORT << endl;
 
     int c = sizeof(_login_server);
-    if (_login_server_socket = accept(_dispatch_server_socket, (struct sockaddr *) &_login_server, (socklen_t *)&c) < 0)
+    if ((_login_server_socket = accept(_dispatch_server_socket, (struct sockaddr *) &_login_server, (socklen_t *)&c)) < 0)
     {
         cout << "[DISPATCH] Error accepting connection from login" << endl;
         exit(1);
@@ -53,13 +53,14 @@ void HachiServer::run()
 
 void HachiServer::login_handler()
 {
+    int recv_size;
     char buffer[64];
     string message;
 
-    while (true)
+    while ((recv_size = recv(_login_server_socket, buffer, sizeof(buffer), 0)) > 0)
     {
-        recv(_login_server_socket, buffer, sizeof(buffer), 0);
         cout << buffer << endl;
+        memset(buffer, 0, 64);
     }
 }
 
