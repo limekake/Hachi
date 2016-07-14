@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <thread>

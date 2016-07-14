@@ -108,8 +108,9 @@ void HachiServer::on_message(uWS::WebSocket socket, char *message, size_t length
         strncpy(login_packet.username, "administrator", 20);
 
         //memcpy(static_cast<void*>(pass_message), static_cast<void*>(&login_packet), sizeof(REQUEST_LOGIN));
+        char* pass_message = static_cast<char*>(static_cast<void*>(&login_packet));
 
-        login_send(static_cast<char*>(static_cast<void*>(&login_packet)));
+        send(_login_server_socket, pass_message, sizeof(REQUEST_LOGIN), 0);
     }
     else
     {
