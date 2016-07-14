@@ -60,7 +60,7 @@ void HachiServer::process_message(const char *message)
     REQUEST_LOGIN login_request;
     memcpy(&login_request, message, sizeof(REQUEST_LOGIN));
 
-    cout << "[LOGIN] User: " << string(login_request.username) <<  " " << login_request.session_id << endl;
+    cout << "[LOGIN] User: " << login_request.username <<  " " << login_request.session_id << endl;
 
     RESPONSE_LOGIN login_response;
     auto response_message = new char[sizeof(RESPONSE_LOGIN)];
