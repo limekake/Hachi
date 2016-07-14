@@ -2,6 +2,7 @@
 #define str(a) #a
 
 #include <iostream>
+#include <cstring>
 #include <thread>
 #include <netdb.h>
 #include <arpa/inet.h>
@@ -12,7 +13,7 @@
 
 using namespace std;
 
-HachiServer::HachiServer() : _outside_server(DISPATCH_SERVER_PORT), _next_sessionid(1)
+HachiServer::HachiServer() : _outside_server(OUTSIDE_SERVER_PORT), _next_sessionid(1)
 {
     _outside_server.onConnection(bind(&HachiServer::on_connect, this, placeholders::_1));
     _outside_server.onDisconnection(bind(&HachiServer::on_disconnect, this, placeholders::_1));
@@ -35,17 +36,17 @@ void HachiServer::run()
         cout << "[DISPATCH] Error binding on port " << DISPATCH_SERVER_PORT << endl;
         exit(1);
     }
-    listen(_dispatch_server_socket);
+    listen(_dispatch_server_socket, 2);
     cout << "DISPATCH SERVER STARTED ON PORT " << DISPATCH_SERVER_PORT << endl;
-    
+
     int c = sizeof(_login_server);
-    if (_login_server_socket = accept(_dispatch_server_socket, (struct sockaddr *) &_login_server, &c) < 0)
+    if (_login_server_socket = accept(_dispatch_server_socket, (struct sockaddr *) &_login_server, (socklen_t *)&c) < 0)
     {
         cout << "[DISPATCH] Error accepting connection from login" << endl;
         exit(1);
     }
     thread _login_thread(&HachiServer::login_handler, this);
-    
+
     _outside_server.run();
     _login_thread.join();
 }
