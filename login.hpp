@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <arpa/inet.h>
-#include <netdb.h>
 
 using namespace std;
 
@@ -12,7 +11,14 @@ class HachiServer
 public:
     HachiServer();
     void run();
-    void send();
+
+private:
+    void on_message();
+    void on_send(const char* message);
+
+    int _dispatch_socket;
+    struct sockaddr_in _dispatch_server;
+    char buffer[64];
 };
 
 #endif
