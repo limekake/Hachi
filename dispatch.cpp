@@ -45,13 +45,13 @@ void HachiServer::run()
         cout << "[DISPATCH] Error accepting connection from login" << endl;
         exit(1);
     }
-    thread _login_thread(&HachiServer::login_handler, this);
+    thread _login_thread(&HachiServer::login_message, this);
 
     _outside_server.run();
     _login_thread.join();
 }
 
-void HachiServer::login_handler()
+void HachiServer::login_message()
 {
     int recv_size;
     char buffer[64];
@@ -62,6 +62,22 @@ void HachiServer::login_handler()
         cout << buffer << endl;
         memset(buffer, 0, 64);
     }
+}
+
+void HachiServer::login_send(const char* message)
+{
+    send(_login_server_socket, message, sizeof(message), 0);
+}
+
+void HachiServer::login_process_message(const char* message)
+{
+    RESPONSE_LOGIN login_request;
+    memcpy(&login_request, message, sizeof(RESPONSE_LOGIN));
+
+    auto session = get_session(login_request.session_id);
+    session->auth = true;
+
+    cout << "[DISPATCH] Login authenticated session " << session->session_id << endl;
 }
 
 
@@ -84,13 +100,12 @@ void HachiServer::on_disconnect(uWS::WebSocket socket)
 
 void HachiServer::on_message(uWS::WebSocket socket, char *message, size_t length, uWS::OpCode opCode)
 {
+    auto session = get_session(socket);
     auto message_data = string(message, length);
+
     cout << "[DISPATCH] Address: " << socket.getAddress().address << endl;
 
-    auto x = 0;
-
-    auto session = get_session(socket);
-    if (!session->auth && x == 0)
+    if (!session->auth)
     {
         auto pass_message = new char[sizeof(REQUEST_LOGIN)];
         REQUEST_LOGIN login_packet;
@@ -98,13 +113,10 @@ void HachiServer::on_message(uWS::WebSocket socket, char *message, size_t length
         strncpy(login_packet.username, "administrator", sizeof(login_packet.username));
         memcpy(static_cast<void*>(pass_message), static_cast<void*>(&login_packet), sizeof(REQUEST_LOGIN));
 
-        //_login_server_ws->send(pass_message);
-        //_login_server_ws->poll();
-        x++;
+        login_send(pass_message);
     }
     else
     {
-        //_map_server_ws->send(message_data);
-        //_map_server_ws->poll();
+        cout << "[DISPATCH] Message: " << message_data << endl;
     }
 }

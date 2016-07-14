@@ -24,7 +24,9 @@ public:
     void on_message(uWS::WebSocket socket, char *message, size_t length, uWS::OpCode opCode);
 
 private:
-    void login_handler();
+    void login_message();
+    void login_send(const char* message);
+    void login_process_message(const char* message);
 
     uWS::Server _outside_server;
     int _next_sessionid;

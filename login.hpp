@@ -13,10 +13,11 @@ public:
     void run();
 
 private:
-    void on_message();
-    void on_send(const char* message);
+    void dispatch_message();
+    void dispatch_send(const char* message);
+    void process_message(const char* message);
 
-    int _dispatch_socket;
+    int _dispatch_server_socket;
     struct sockaddr_in _dispatch_server;
     char buffer[64];
 };

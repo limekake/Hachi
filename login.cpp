@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <cstring>
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -11,8 +12,8 @@ using namespace std;
 
 HachiServer::HachiServer()
 {
-    _dispatch_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (_dispatch_socket < 0)
+    _dispatch_server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (_dispatch_server_socket < 0)
     {
         cout << "[LOGIN] Error creating socket" << endl;
         exit(1);
@@ -25,44 +26,46 @@ HachiServer::HachiServer()
 
 void HachiServer::run()
 {
-    if (connect(_dispatch_socket, (struct sockaddr *)&_dispatch_server, sizeof(_dispatch_server)) < 0)
+    if (connect(_dispatch_server_socket, (struct sockaddr *)&_dispatch_server, sizeof(_dispatch_server)) < 0)
     {
         cout << "[LOGIN] Error connecting to dispatch" << endl;
         exit(1);
     }
     cout << "[LOGIN] Connected to dispatch" << endl;
 
-    thread _dispatch_thread(&HachiServer::on_message, this);
-    on_send("HELLO");
+    thread _dispatch_thread(&HachiServer::dispatch_message, this);
+
     _dispatch_thread.join();
 }
 
-void HachiServer::on_message()
+void HachiServer::dispatch_message()
 {
     char buffer[64];
     string message;
 
-    while (true)
+    while ((recv_size = recv(_dispatch_server_socket, buffer, sizeof(buffer), 0)) > 0)
     {
-        recv(_dispatch_socket, buffer, sizeof(buffer), 0);
-        cout << buffer << endl;
+        process_message(buffer);
+        memset(buffer, 0, 64);
     }
 }
 
-void HachiServer::on_send(const char* message)
+void HachiServer::dispatch_send(const char* message)
 {
-    send(_dispatch_socket, message, sizeof(message), 0);
+    send(_dispatch_server_socket, message, sizeof(message), 0);
 }
 
-//void HachiServer::process_message(const char *message)
-//{
-//    REQUEST_LOGIN login_request;
-//    memcpy(&login_request, message, sizeof(REQUEST_LOGIN));
-//
-//    //cout << "[LOGIN] User: " << string(login_request.username) <<  " " << login_request.session_id << endl;
-//
-//    RESPONSE_LOGIN login_response;
-//    login_response.session_id = login_request.session_id;
-//    auto response_message = new char[sizeof(RESPONSE_LOGIN)];
-//    memcpy(static_cast<void*>(&login_response), static_cast<void*>(response_message), sizeof(RESPONSE_LOGIN));
-//}
+void HachiServer::process_message(const char *message)
+{
+    REQUEST_LOGIN login_request;
+    memcpy(&login_request, message, sizeof(REQUEST_LOGIN));
+
+    cout << "[LOGIN] User: " << string(login_request.username) <<  " " << login_request.session_id << endl;
+
+    RESPONSE_LOGIN login_response;
+    auto response_message = new char[sizeof(RESPONSE_LOGIN)];
+    login_response.session_id = login_request.session_id;
+    memcpy(static_cast<void*>(&login_response), static_cast<void*>(response_message), sizeof(RESPONSE_LOGIN));
+
+    dispatch_send(response_message);
+}
