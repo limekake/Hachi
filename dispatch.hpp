@@ -51,15 +51,9 @@ private:
 
     connection_session* get_session(int session_id)
     {
-        typedef map<uWS::WebSocket, connection_session>::iterator it_type;
-        for (auto i : _connection_pool)
-        {
-            cout << i.second.session_id << endl;
-            if (i.second.session_id == session_id)
-            {
-                return &(i.second);
-            }
-        }
+        for (auto it = _connection_pool.begin(); it != _connection_pool.end(); ++it)
+            if (it->second.session_id == session_id)
+                return &(it->second);
         return nullptr;
     }
 };
