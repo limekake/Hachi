@@ -4,6 +4,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <thread>
+#include <cereal/archives/binary.hpp>
 #include "login.hpp"
 #include "packet.hpp"
 #include "network.hpp"
@@ -58,15 +59,19 @@ void HachiServer::dispatch_send(const char* message)
 
 void HachiServer::process_message(const char *message)
 {
+    stringstream ss;
+    ss << message;
     REQUEST_LOGIN login_request;
-    memcpy(&login_request, message, sizeof(REQUEST_LOGIN));
+    //memcpy(&login_request, message, sizeof(REQUEST_LOGIN));
+    cereal::BinaryInputArchive ar(ss);
+    ar(cereal::binary_data(login_request, sizeof(login_request)));
 
     cout << "[LOGIN] User: " << login_request.username <<  " " << login_request.session_id << endl;
 
-    RESPONSE_LOGIN login_response;
+    /*RESPONSE_LOGIN login_response;
     auto response_message = new char[sizeof(RESPONSE_LOGIN)];
     login_response.session_id = login_request.session_id;
     memcpy(static_cast<void*>(&login_response), static_cast<void*>(response_message), sizeof(RESPONSE_LOGIN));
 
-    dispatch_send(response_message);
+    dispatch_send(response_message);*/
 }

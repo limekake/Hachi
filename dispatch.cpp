@@ -1,12 +1,10 @@
-#define xstr(a) str(a)
-#define str(a) #a
-
 #include <iostream>
 #include <cstring>
 #include <thread>
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <uWS/uWS.h>
+#include <cereal/archives/binary.hpp>
 #include "dispatch.hpp"
 #include "network.hpp"
 #include "packet.hpp"
@@ -105,14 +103,17 @@ void HachiServer::on_message(uWS::WebSocket socket, char *message, size_t length
 
     if (!session->auth)
     {
-        auto pass_message = new char[sizeof(REQUEST_LOGIN)];
+        //auto pass_message = new char[sizeof(REQUEST_LOGIN)];
         REQUEST_LOGIN login_packet;
         login_packet.session_id = session->session_id;
         strncpy(login_packet.username, "administrator", 20);
-        memcpy(static_cast<void*>(pass_message), static_cast<void*>(&login_packet), sizeof(REQUEST_LOGIN));
-        cout << login_packet.username << endl;
 
-        login_send(pass_message);
+        //memcpy(static_cast<void*>(pass_message), static_cast<void*>(&login_packet), sizeof(REQUEST_LOGIN));
+        stringstream ss;
+        cereal::BinaryOutputArchive ar(ss);
+        ar(cereal::binary_data(login_packet, sizeof(login_packet)));
+
+        login_send(ss.str().c_str());
     }
     else
     {
