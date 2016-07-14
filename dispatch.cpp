@@ -56,14 +56,14 @@ void HachiServer::login_message()
 
     while ((recv_size = recv(_login_server_socket, buffer, 64, 0)) > 0)
     {
-        cout << buffer << endl;
+        login_process_message(buffer);
         memset(buffer, 0, 64);
     }
 }
 
-void HachiServer::login_send(const char* message)
+void HachiServer::login_send(const char* message, size_t size)
 {
-    send(_login_server_socket, message, sizeof(message), 0);
+    send(_login_server_socket, message, size, 0);
 }
 
 void HachiServer::login_process_message(const char* message)
@@ -102,15 +102,13 @@ void HachiServer::on_message(uWS::WebSocket socket, char *message, size_t length
 
     if (!session->auth)
     {
-        //auto pass_message = new char[sizeof(REQUEST_LOGIN)];
+        auto pass_message = new char[sizeof(REQUEST_LOGIN)];
         REQUEST_LOGIN login_packet;
         login_packet.session_id = session->session_id;
         strncpy(login_packet.username, "administrator", 20);
+        memcpy(static_cast<void*>(pass_message), static_cast<void*>(&login_packet), sizeof(REQUEST_LOGIN));
 
-        //memcpy(static_cast<void*>(pass_message), static_cast<void*>(&login_packet), sizeof(REQUEST_LOGIN));
-        char* pass_message = static_cast<char*>(static_cast<void*>(&login_packet));
-
-        send(_login_server_socket, pass_message, sizeof(REQUEST_LOGIN), 0);
+        login_send(pass_message, sizeof(REQUEST_LOGIN));
     }
     else
     {

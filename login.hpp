@@ -14,7 +14,7 @@ public:
 
 private:
     void dispatch_message();
-    void dispatch_send(const char* message);
+    void dispatch_send(const char* message, size_t size);
     void process_message(const char* message);
 
     int _dispatch_server_socket;
