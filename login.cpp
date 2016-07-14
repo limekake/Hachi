@@ -20,7 +20,7 @@ HachiServer::HachiServer()
 
     _dispatch_server.sin_addr.s_addr = inet_addr("127.0.0.1");
     _dispatch_server.sin_family = AF_INET;
-    _dispatch_server.sin_family = htons(DISPATCH_SERVER_PORT);
+    _dispatch_server.sin_port = htons(DISPATCH_SERVER_PORT);
 }
 
 void HachiServer::run()
@@ -33,6 +33,8 @@ void HachiServer::run()
     cout << "[LOGIN] Connected to dispatch" << endl;
 
     thread _dispatch_thread(&HachiServer::on_message, this);
+    on_send("HELLO");
+    _dispatch_thread.join();
 }
 
 void HachiServer::on_message()
