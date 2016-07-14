@@ -2,7 +2,9 @@
 #define str(a) #a
 
 #include <iostream>
-#include <cstring>
+#include <thread>
+#include <netdb.h>
+#include <arpa/inet.h>
 #include <uWS/uWS.h>
 #include "dispatch.hpp"
 #include "network.hpp"
@@ -10,18 +12,56 @@
 
 using namespace std;
 
-HachiServer::HachiServer() : _server(DISPATCH_SERVER_PORT), _next_sessionid(1)
+HachiServer::HachiServer() : _outside_server(DISPATCH_SERVER_PORT), _next_sessionid(1)
 {
-    _server.onConnection(bind(&HachiServer::on_connect, this, placeholders::_1));
-    _server.onDisconnection(bind(&HachiServer::on_disconnect, this, placeholders::_1));
-    _server.onMessage(bind(&HachiServer::on_message, this, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4));
+    _outside_server.onConnection(bind(&HachiServer::on_connect, this, placeholders::_1));
+    _outside_server.onDisconnection(bind(&HachiServer::on_disconnect, this, placeholders::_1));
+    _outside_server.onMessage(bind(&HachiServer::on_message, this, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4));
+
+    _dispatch_server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (_dispatch_server_socket < 0)
+    {
+        cout << "[DISPATCH] Error creating socket" << endl;
+        exit(1);
+    }
+    _dispatch_server.sin_family = AF_INET;
+    _dispatch_server.sin_addr.s_addr = inet_addr("127.0.0.1");
+    _dispatch_server.sin_port = htons(DISPATCH_SERVER_PORT);
 }
 
 void HachiServer::run()
 {
+    if (bind(_dispatch_server_socket, (struct sockaddr *) &_dispatch_server, sizeof(_dispatch_server)) < 0) {
+        cout << "[DISPATCH] Error binding on port " << DISPATCH_SERVER_PORT << endl;
+        exit(1);
+    }
+    listen(_dispatch_server_socket);
     cout << "DISPATCH SERVER STARTED ON PORT " << DISPATCH_SERVER_PORT << endl;
-    _server.run();
+    
+    int c = sizeof(_login_server);
+    if (_login_server_socket = accept(_dispatch_server_socket, (struct sockaddr *) &_login_server, &c) < 0)
+    {
+        cout << "[DISPATCH] Error accepting connection from login" << endl;
+        exit(1);
+    }
+    thread _login_thread(&HachiServer::login_handler, this);
+    
+    _outside_server.run();
+    _login_thread.join();
 }
+
+void HachiServer::login_handler()
+{
+    char buffer[64];
+    string message;
+
+    while (true)
+    {
+        recv(_login_server_socket, buffer, sizeof(buffer), 0);
+        cout << buffer << endl;
+    }
+}
+
 
 void HachiServer::on_connect(uWS::WebSocket socket)
 {

@@ -2,6 +2,7 @@
 #define DISPATCH_SERVER_HEADER
 
 #include <iostream>
+#include <arpa/inet.h>
 #include <uWS/uWS.h>
 #include <map>
 
@@ -23,6 +24,17 @@ public:
     void on_message(uWS::WebSocket socket, char *message, size_t length, uWS::OpCode opCode);
 
 private:
+    void login_handler();
+
+    uWS::Server _outside_server;
+    int _next_sessionid;
+    map<uWS::WebSocket, connection_session> _connection_pool;
+
+    int _dispatch_server_socket;
+    int _login_server_socket;
+    struct sockaddr_in _dispatch_server;
+    struct sockaddr_in _login_server;
+
     connection_session* get_session(uWS::WebSocket socket)
     {
         auto session = _connection_pool.find(socket);
@@ -47,12 +59,6 @@ private:
         }
         return nullptr;
     }
-
-    uWS::Server _server;
-    uWS::WebSocket _login_server_socket;
-    uWS::WebSocket _map_server_socket;
-    int _next_sessionid;
-    map<uWS::WebSocket, connection_session> _connection_pool;
 };
 
 #endif
