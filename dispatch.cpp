@@ -74,7 +74,7 @@ void HachiServer::login_process_message(const char* message)
     auto session = get_session(login_request.session_id);
     session->auth = true;
 
-    cout << "[DISPATCH] Login authenticated session" << endl;
+    cout << "[DISPATCH] Login authenticated session " << session->session_id <<  endl;
 }
 
 
