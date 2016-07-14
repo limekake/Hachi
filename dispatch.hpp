@@ -3,8 +3,6 @@
 
 #include <iostream>
 #include <uWS/uWS.h>
-#include "easywsclient/easywsclient.hpp"
-#include "network.hpp"
 #include <map>
 
 using namespace std;
@@ -15,14 +13,14 @@ struct connection_session {
     bool auth = false;
 };
 
-class HachiServer : public HachiNetwork
+class HachiServer
 {
 public:
     HachiServer();
-    void run() override;
-    void on_connect(uWS::WebSocket socket) override;
-    void on_disconnect(uWS::WebSocket socket) override;
-    void on_message(uWS::WebSocket socket, char *message, size_t length, uWS::OpCode opCode) override;
+    void run();
+    void on_connect(uWS::WebSocket socket) ;
+    void on_disconnect(uWS::WebSocket socket) ;
+    void on_message(uWS::WebSocket socket, char *message, size_t length, uWS::OpCode opCode);
 
 private:
     connection_session* get_session(uWS::WebSocket socket)
@@ -50,8 +48,9 @@ private:
         return nullptr;
     }
 
-    easywsclient::WebSocket::pointer _login_server_ws;
-    easywsclient::WebSocket::pointer _map_server_ws;
+    uWS::Server _server;
+    uWS::WebSocket _login_server_socket;
+    uWS::WebSocket _map_server_socket;
     int _next_sessionid;
     map<uWS::WebSocket, connection_session> _connection_pool;
 };

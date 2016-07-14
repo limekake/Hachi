@@ -4,21 +4,14 @@
 #include <iostream>
 #include <cstring>
 #include <uWS/uWS.h>
-#include "easywsclient/easywsclient.hpp"
 #include "dispatch.hpp"
 #include "network.hpp"
 #include "packet.hpp"
 
 using namespace std;
 
-HachiServer::HachiServer() : HachiNetwork(DISPATCH_SERVER_PORT), _next_sessionid(1)
+HachiServer::HachiServer() : _server(DISPATCH_SERVER_PORT), _next_sessionid(1)
 {
-    _login_server_ws = easywsclient::WebSocket::from_url("ws://localhost:" xstr(LOGIN_SERVER_PORT));
-    cout << "LOGIN SERVER CONNECTED" << endl;
-
-    _map_server_ws = easywsclient::WebSocket::from_url("ws://localhost:" xstr(MAP_SERVER_PORT));
-    cout << "MAP SERVER CONNECTED" << endl;
-
     _server.onConnection(bind(&HachiServer::on_connect, this, placeholders::_1));
     _server.onDisconnection(bind(&HachiServer::on_disconnect, this, placeholders::_1));
     _server.onMessage(bind(&HachiServer::on_message, this, placeholders::_1, placeholders::_2, placeholders::_3, placeholders::_4));
@@ -63,8 +56,8 @@ void HachiServer::on_message(uWS::WebSocket socket, char *message, size_t length
         strncpy(login_packet.username, "administrator", sizeof(login_packet.username));
         memcpy(static_cast<void*>(pass_message), static_cast<void*>(&login_packet), sizeof(REQUEST_LOGIN));
 
-        _login_server_ws->send(pass_message);
-        _login_server_ws->poll();
+        //_login_server_ws->send(pass_message);
+        //_login_server_ws->poll();
         x++;
     }
     else

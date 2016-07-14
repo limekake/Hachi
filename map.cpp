@@ -1,13 +1,12 @@
 #include <iostream>
 #include <cstring>
-#include <uWS/uWS.h>
 #include "network.hpp"
 #include "map.hpp"
 #include "packet.hpp"
 
 using namespace std;
 
-HachiServer::HachiServer() : HachiNetwork(MAP_SERVER_PORT)
+HachiServer::HachiServer()
 {
     _server.onConnection(bind(&HachiServer::on_connect, this, placeholders::_1));
     _server.onDisconnection(bind(&HachiServer::on_disconnect, this, placeholders::_1));
