@@ -72,7 +72,7 @@ void HachiServer::login_process_message(const char* message)
     memcpy(&login_request, message, sizeof(RESPONSE_LOGIN));
 
     auto session = get_session(login_request.session_id);
-    //session->auth = true;
+    session->auth = true;
 
     cout << "[DISPATCH] Login authenticated session" << endl;
 }
@@ -103,10 +103,10 @@ void HachiServer::on_message(uWS::WebSocket socket, char *message, size_t length
     if (!session->auth)
     {
         auto pass_message = new char[sizeof(REQUEST_LOGIN)];
-        REQUEST_LOGIN login_packet;
-        login_packet.session_id = session->session_id;
-        strncpy(login_packet.username, "administrator", 20);
-        memcpy(static_cast<void*>(pass_message), static_cast<void*>(&login_packet), sizeof(REQUEST_LOGIN));
+        REQUEST_LOGIN login_request;
+        login_request.session_id = session->session_id;
+        strncpy(login_request.username, "administrator", 20);
+        memcpy(static_cast<void*>(pass_message), static_cast<void*>(&login_request), sizeof(REQUEST_LOGIN));
 
         login_send(pass_message, sizeof(REQUEST_LOGIN));
     }

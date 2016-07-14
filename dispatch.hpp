@@ -51,16 +51,14 @@ private:
 
     connection_session* get_session(int session_id)
     {
-        cout << session_id << endl;
-        connection_session* session = nullptr;
-        for (auto it = _connection_pool.begin(); it != _connection_pool.end(); it++)
+        for (auto it = _connection_pool.begin(); it != _connection_pool.end(); ++it)
         {
             if (it->second.session_id == session_id)
             {
-                cout << it->second.session_id << endl;
+                return &(it->second);
             }
         }
-        return session;
+        return nullptr;
     }
 };
 
