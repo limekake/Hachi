@@ -40,6 +40,7 @@ void HachiServer::run()
 
 void HachiServer::dispatch_message()
 {
+    int recv_size;
     char buffer[64];
     string message;
 
