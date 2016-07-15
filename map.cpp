@@ -59,3 +59,11 @@ void HachiServer::dispatch_send(const char* message, size_t size)
 void HachiServer::process_message(const char *message)
 {
 }
+
+int main(int argc, char *argv[])
+{
+    HachiServer _server;
+    _server.run();
+
+    return 0;
+}

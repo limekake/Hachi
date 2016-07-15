@@ -11,9 +11,14 @@ struct RESPONSE_LOGIN
     int session_id;
 };
 
-struct REQUEST_LOGIN
+struct REQUEST_LOGIN_INTERNAL
 {
     int session_id;
+    char username[20];
+};
+
+struct REQUEST_LOGIN_EXTERNAL
+{
     char username[20];
 };
 

@@ -10,7 +10,7 @@
 
 using namespace std;
 
-HachiServer::HachiServer() : _outside_server(OUTSIDE_SERVER_PORT), _next_sessionid(1)
+HachiServer::HachiServer() : _outside_server(OUTSIDE_SERVER_PORT)
 {
     _outside_server.onConnection(bind(&HachiServer::on_connect, this, placeholders::_1));
     _outside_server.onDisconnection(bind(&HachiServer::on_disconnect, this, placeholders::_1));
@@ -114,7 +114,7 @@ void HachiServer::internal_server_send(int server_socket, const char* message, s
 void HachiServer::on_connect(uWS::WebSocket socket)
 {
     connection_session new_session;
-    new_session.session_id = _next_sessionid++;
+    new_session.socket = socket;
     _connection_pool[socket] = new_session;
     cout << "[DISPATCH] Connect: " << socket.getAddress().address << ":" << socket.getAddress().port << endl;
 }
@@ -135,16 +135,27 @@ void HachiServer::on_message(uWS::WebSocket socket, char *message, size_t length
 
     if (!session->auth)
     {
-        auto pass_message = new char[sizeof(REQUEST_LOGIN)];
-        REQUEST_LOGIN login_request;
-        login_request.session_id = session->session_id;
-        strncpy(login_request.username, "administrator", 20);
-        memcpy(static_cast<void*>(pass_message), static_cast<void*>(&login_request), sizeof(REQUEST_LOGIN));
+        REQUEST_LOGIN_EXTERNAL request_login_external;
+        memcpy(&request_login_external, message, sizeof(REQUEST_LOGIN_EXTERNAL));
 
-        internal_server_send(_login_server_socket, pass_message, sizeof(REQUEST_LOGIN));
+        //auto pass_message = new char[sizeof(REQUEST_LOGIN_INTERNAL)];
+        //REQUEST_LOGIN_INTERNAL request_login;
+        //request_login.session_id = session->session_id;
+        //strncpy(request_login.username, "administrator", 20);
+        //memcpy(static_cast<void*>(pass_message), static_cast<void*>(&request_login), sizeof(REQUEST_LOGIN_INTERNAL));
+
+        internal_server_send(_login_server_socket, message, sizeof(message));
     }
     else
     {
-        cout << "[DISPATCH] Message: " << message_data << endl;
+        internal_server_send(_login_server_socket, message, sizeof(message));
     }
+}
+
+int main(int argc, char *argv[])
+{
+    HachiServer _server;
+    _server.run();
+
+    return 0;
 }

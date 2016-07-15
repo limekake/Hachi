@@ -3,8 +3,8 @@ CFLAGS = -std=c++11 -luv -lssl -lcrypto -lz -lpthread -luWS
 
 all: HachiDispatch HachiLogin
 
-HachiDispatch: core.cpp dispatch.cpp ; $(CC) -o HachiDispatch core.cpp dispatch.cpp $(CFLAGS) -DDISPATCH_SERVER
+HachiDispatch: dispatch.cpp ; $(CC) -o HachiDispatch dispatch.cpp $(CFLAGS)
 
-HachiLogin: core.cpp login.cpp ; $(CC) -o HachiLogin core.cpp login.cpp $(CFLAGS) -DLOGIN_SERVER
+HachiLogin: login.cpp ; $(CC) -o HachiLogin login.cpp $(CFLAGS)
 
-HachiMap: core.cpp map.cpp ; $(CC) -o HachiMap core.cpp map.cpp $(CFLAGS) -DMAP_SERVER
+HachiMap: map.cpp ; $(CC) -o HachiMap map.cpp $(CFLAGS)

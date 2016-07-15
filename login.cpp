@@ -66,15 +66,23 @@ void HachiServer::dispatch_send(const char* message, size_t size)
 
 void HachiServer::process_message(const char *message)
 {
-    REQUEST_LOGIN login_request;
-    memcpy(&login_request, message, sizeof(REQUEST_LOGIN));
+    REQUEST_LOGIN_INTERNAL request_login;
+    memcpy(&request_login, message, sizeof(REQUEST_LOGIN_INTERNAL));
 
-    cout << "[LOGIN] User: " << login_request.username <<  " " << login_request.session_id << endl;
+    cout << "[LOGIN] User: " << request_login.username <<  " " << request_login.session_id << endl;
 
     RESPONSE_LOGIN login_response;
     auto response_message = new char[sizeof(RESPONSE_LOGIN)];
-    login_response.session_id = login_request.session_id;
+    login_response.session_id = request_login.session_id;
     memcpy(static_cast<void*>(response_message), static_cast<void*>(&login_response), sizeof(RESPONSE_LOGIN));
 
     dispatch_send(response_message, sizeof(RESPONSE_LOGIN));
+}
+
+int main(int argc, char *argv[])
+{
+    HachiServer _server;
+    _server.run();
+
+    return 0;
 }
