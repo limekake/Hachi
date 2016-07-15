@@ -1,6 +1,11 @@
 #ifndef PACKETS
 #define PACKETS
 
+struct SERVER_CONNECT
+{
+    int server_type;
+};
+
 struct RESPONSE_LOGIN
 {
     int session_id;

@@ -19,23 +19,27 @@ class HachiServer
 public:
     HachiServer();
     void run();
+
+private:
     void on_connect(uWS::WebSocket socket) ;
     void on_disconnect(uWS::WebSocket socket) ;
     void on_message(uWS::WebSocket socket, char *message, size_t length, uWS::OpCode opCode);
 
-private:
-    void login_message();
-    void login_send(const char* message, size_t size);
+    void internal_server_send(int server_socket, const char* message, size_t size);
+    void generic_server_listen();
+    void generic_server_handler(int socket);
+    void login_server_handler();
     void login_process_message(const char* message);
+    void map_server_handler();
 
     uWS::Server _outside_server;
     int _next_sessionid;
     map<uWS::WebSocket, connection_session> _connection_pool;
 
+    struct sockaddr_in _dispatch_server;
     int _dispatch_server_socket;
     int _login_server_socket;
-    struct sockaddr_in _dispatch_server;
-    struct sockaddr_in _login_server;
+    int _map_server_socket;
 
     connection_session* get_session(uWS::WebSocket socket)
     {

@@ -31,6 +31,14 @@ void HachiServer::run()
         cout << "[LOGIN] Error connecting to dispatch" << endl;
         exit(1);
     }
+
+    auto server_connect_message = new char[sizeof(SERVER_CONNECT)];
+    SERVER_CONNECT server_connect;
+    server_connect.server_type = SERVER_TYPE::LOGIN;
+    memcpy(static_cast<void*>(server_connect_message), static_cast<void*>(&server_connect), sizeof(SERVER_CONNECT));
+
+    send(_dispatch_server_socket, server_connect_message, sizeof(SERVER_CONNECT), 0);
+
     cout << "[LOGIN] Connected to dispatch" << endl;
 
     thread _dispatch_thread(&HachiServer::dispatch_message, this);

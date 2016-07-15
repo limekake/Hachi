@@ -34,36 +34,61 @@ void HachiServer::run()
         exit(1);
     }
     listen(_dispatch_server_socket, 2);
-    cout << "DISPATCH SERVER STARTED ON PORT " << DISPATCH_SERVER_PORT << endl;
+    cout << "[DISPATCH] Server started on port  " << DISPATCH_SERVER_PORT << endl;
 
-    int c = sizeof(_login_server);
-    if ((_login_server_socket = accept(_dispatch_server_socket, (struct sockaddr *) &_login_server, (socklen_t *)&c)) < 0)
-    {
-        cout << "[DISPATCH] Error accepting connection from login" << endl;
-        exit(1);
-    }
-    thread _login_thread(&HachiServer::login_message, this);
+    thread _generic_server_thread(&HachiServer::generic_server_listen, this);
 
     _outside_server.run();
-    _login_thread.join();
+    _generic_server_thread.join();
 }
 
-void HachiServer::login_message()
+void HachiServer::generic_server_listen()
+{
+    struct sockaddr_in _generic_server;
+    int c = sizeof(_generic_server);
+    while (true)
+    {
+        int generic_socket = accept(_dispatch_server_socket, (struct sockaddr *) &_generic_server, (socklen_t *)&c);
+        thread (&HachiServer::generic_server_handler, this, generic_socket).detach();
+    }
+}
+
+void HachiServer::generic_server_handler(int socket)
+{
+    char buffer[64];
+    recv(socket, buffer, 64, 0);
+
+    SERVER_CONNECT server_connect;
+    memcpy(&server_connect, buffer, sizeof(SERVER_CONNECT));
+    switch (server_connect.server_type)
+    {
+        case SERVER_TYPE::LOGIN:
+        {
+            _login_server_socket = socket;
+            cout << "[DISPATCH] Login server has connected" << endl;
+            thread (&HachiServer::login_server_handler, this).detach();
+            break;
+        }
+        case SERVER_TYPE::MAP:
+        {
+            _map_server_socket = socket;
+            cout << "[DISPATCH] Map server has connected" << endl;
+            thread (&HachiServer::map_server_handler, this).detach();
+            break;
+        }
+    }
+}
+
+void HachiServer::login_server_handler()
 {
     int recv_size;
     char buffer[64];
-    string message;
 
     while ((recv_size = recv(_login_server_socket, buffer, 64, 0)) > 0)
     {
         login_process_message(buffer);
         memset(buffer, 0, 64);
     }
-}
-
-void HachiServer::login_send(const char* message, size_t size)
-{
-    send(_login_server_socket, message, size, 0);
 }
 
 void HachiServer::login_process_message(const char* message)
@@ -77,6 +102,14 @@ void HachiServer::login_process_message(const char* message)
     cout << "[DISPATCH] Login authenticated session " << session->session_id <<  endl;
 }
 
+void HachiServer::map_server_handler()
+{
+}
+
+void HachiServer::internal_server_send(int server_socket, const char* message, size_t size)
+{
+    send(server_socket, message, size, 0);
+}
 
 void HachiServer::on_connect(uWS::WebSocket socket)
 {
@@ -108,7 +141,7 @@ void HachiServer::on_message(uWS::WebSocket socket, char *message, size_t length
         strncpy(login_request.username, "administrator", 20);
         memcpy(static_cast<void*>(pass_message), static_cast<void*>(&login_request), sizeof(REQUEST_LOGIN));
 
-        login_send(pass_message, sizeof(REQUEST_LOGIN));
+        internal_server_send(_login_server_socket, pass_message, sizeof(REQUEST_LOGIN));
     }
     else
     {
