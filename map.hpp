@@ -1,24 +1,25 @@
 #ifndef MAP_SERVER_HEADER
 #define MAP_SERVER_HEADER
 
-#include <uWS/uWS.h>
-#include "network.hpp"
+#include <iostream>
+#include <arpa/inet.h>
 
 using namespace std;
 
-class HachiServer : public HachiNetwork
+class HachiServer
 {
 public:
     HachiServer();
-    void run() override;
-    void on_connect(uWS::WebSocket socket) override;
-    void on_disconnect(uWS::WebSocket socket) override;
-    void on_message(uWS::WebSocket socket, char *message, size_t length, uWS::OpCode opCode) override;
+    void run();
 
 private:
-    static void process_message(const char *message);
+    void dispatch_message();
+    void dispatch_send(const char* message, size_t size);
+    void process_message(const char* message);
 
-    uWS::WebSocket _dispatch_server;
+    int _dispatch_server_socket;
+    struct sockaddr_in _dispatch_server;
+    char buffer[64];
 };
 
 #endif
