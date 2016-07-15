@@ -35,23 +35,41 @@ private:
     void map_server_handler();
 
     uWS::Server _outside_server;
-    map<int, connection_session> _connection_pool;
+    map<uWS::WebSocket, int> _connection_pool;
+    map<int, connection_session> _session_pool;
 
     struct sockaddr_in _dispatch_server;
+    int _next_session_id;
     int _dispatch_server_socket;
     int _login_server_socket;
     int _map_server_socket;
 
-    connection_session* get_session(int id)
+    connection_session* get_session(uWS::WebSocket socket)
     {
-        auto session = _connection_pool.find(id);
+        return get_connection_session(get_session_id(socket));
+    }
 
-        if (session == _connection_pool.end())
+    int get_session_id(uWS::WebSocket socket)
+    {
+        auto pair = _connection_pool.find(socket);
+        if (pair == _connection_pool.end())
+        {
+            cout << "No session id is mapped to this connection" << endl;
+            exit(1);
+        }
+        return (pair->second);
+    }
+
+    connection_session* get_connection_session(int id)
+    {
+        auto pair = _session_pool.find(id);
+
+        if (pair == _session_pool.end())
         {
             cout << "No session found!" << endl;
             throw;
         }
-        return &(session->second);
+        return &(pair->second);
     }
 };
 

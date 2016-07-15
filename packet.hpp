@@ -6,9 +6,14 @@ struct SERVER_CONNECT
     int server_type;
 };
 
-struct RESPONSE_LOGIN
+struct RESPONSE_LOGIN_INTERNAL
 {
     int session_id;
+};
+
+struct RESPONSE_LOGIN_EXTERNAL
+{
+    bool auth;
 };
 
 struct REQUEST_LOGIN_INTERNAL

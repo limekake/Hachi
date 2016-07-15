@@ -10,7 +10,7 @@
 
 using namespace std;
 
-HachiServer::HachiServer() : _outside_server(OUTSIDE_SERVER_PORT)
+HachiServer::HachiServer() : _outside_server(OUTSIDE_SERVER_PORT), _next_session_id(1)
 {
     _outside_server.onConnection(bind(&HachiServer::on_connect, this, placeholders::_1));
     _outside_server.onDisconnection(bind(&HachiServer::on_disconnect, this, placeholders::_1));
@@ -34,10 +34,11 @@ void HachiServer::run()
         exit(1);
     }
     listen(_dispatch_server_socket, 2);
-    cout << "[DISPATCH] Server started on port  " << DISPATCH_SERVER_PORT << endl;
+    cout << "[DISPATCH] Internal listening on port " << DISPATCH_SERVER_PORT << endl;
 
     thread _generic_server_thread(&HachiServer::generic_server_listen, this);
 
+    cout << "[DISPATCH] External listening on port " << OUTSIDE_SERVER_PORT << endl;
     _outside_server.run();
     _generic_server_thread.join();
 }
@@ -93,13 +94,19 @@ void HachiServer::login_server_handler()
 
 void HachiServer::login_process_message(const char* message)
 {
-    RESPONSE_LOGIN login_request;
-    memcpy(&login_request, message, sizeof(RESPONSE_LOGIN));
+    RESPONSE_LOGIN_INTERNAL response_login_internal;
+    memcpy(&response_login_internal, message, sizeof(RESPONSE_LOGIN_INTERNAL));
 
-    auto session = get_session(login_request.session_id);
+    auto session = get_connection_session(response_login_internal.session_id);
     session->auth = true;
 
     cout << "[DISPATCH] Login authenticated session " << session->session_id <<  endl;
+
+    RESPONSE_LOGIN_EXTERNAL response_login_external;
+    auto response_message = new char[sizeof(RESPONSE_LOGIN_EXTERNAL)];
+    response_login_external.auth = true;
+    memcpy(static_cast<void*>(response_message), static_cast<void*>(&response_login_external), sizeof(RESPONSE_LOGIN_EXTERNAL));
+    session->socket.send(response_message, sizeof(response_message), uWS::OpCode::BINARY);
 }
 
 void HachiServer::map_server_handler()
@@ -115,40 +122,48 @@ void HachiServer::on_connect(uWS::WebSocket socket)
 {
     connection_session new_session;
     new_session.socket = socket;
-    _connection_pool[socket] = new_session;
+    new_session.session_id = _next_session_id++;
+
+    _connection_pool[new_session.socket] = new_session.session_id;
+    _session_pool[new_session.session_id] = new_session;
+
     cout << "[DISPATCH] Connect: " << socket.getAddress().address << ":" << socket.getAddress().port << endl;
 }
 
 void HachiServer::on_disconnect(uWS::WebSocket socket)
 {
-    auto session = get_session(socket);
+    auto id = get_session_id(socket);
 
     cout << "[DISPATCH] Disconnect: " << socket.getAddress().address << ":" << socket.getAddress().port << endl;
 
+    _session_pool.erase(id);
     _connection_pool.erase(socket);
 }
 
 void HachiServer::on_message(uWS::WebSocket socket, char *message, size_t length, uWS::OpCode opCode)
 {
     auto session = get_session(socket);
-    auto message_data = string(message, length);
+    auto message_data = string(message, length).c_str();
 
     if (!session->auth)
     {
-        REQUEST_LOGIN_EXTERNAL request_login_external;
-        memcpy(&request_login_external, message, sizeof(REQUEST_LOGIN_EXTERNAL));
+        //REQUEST_LOGIN_EXTERNAL request_login_external;
+        //request_login_external.username = string(message_data);
+        //memcpy(&request_login_external, message_data, sizeof(REQUEST_LOGIN_EXTERNAL));
 
-        //auto pass_message = new char[sizeof(REQUEST_LOGIN_INTERNAL)];
-        //REQUEST_LOGIN_INTERNAL request_login;
-        //request_login.session_id = session->session_id;
-        //strncpy(request_login.username, "administrator", 20);
-        //memcpy(static_cast<void*>(pass_message), static_cast<void*>(&request_login), sizeof(REQUEST_LOGIN_INTERNAL));
+        //cout << request_login_external.username << endl;
 
-        internal_server_send(_login_server_socket, message, sizeof(message));
+        auto pass_message = new char[sizeof(REQUEST_LOGIN_INTERNAL)];
+        REQUEST_LOGIN_INTERNAL request_login_internal;
+        request_login_internal.session_id = session->session_id;
+        strncpy(request_login_internal.username, message_data, 20);
+        memcpy(static_cast<void*>(pass_message), static_cast<void*>(&request_login_internal), sizeof(REQUEST_LOGIN_INTERNAL));
+
+        internal_server_send(_login_server_socket, pass_message, sizeof(REQUEST_LOGIN_INTERNAL));
     }
     else
     {
-        internal_server_send(_login_server_socket, message, sizeof(message));
+        cout << "[DISPATCH] Message: " << message_data << endl;
     }
 }
 

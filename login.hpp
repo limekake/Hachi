@@ -13,7 +13,7 @@ public:
     void run();
 
 private:
-    void dispatch_message();
+    void dispatch_server_handler();
     void dispatch_send(const char* message, size_t size);
     void process_message(const char* message);
 

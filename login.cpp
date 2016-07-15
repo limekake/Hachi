@@ -41,16 +41,15 @@ void HachiServer::run()
 
     cout << "[LOGIN] Connected to dispatch" << endl;
 
-    thread _dispatch_thread(&HachiServer::dispatch_message, this);
+    thread _dispatch_thread(&HachiServer::dispatch_server_handler, this);
 
     _dispatch_thread.join();
 }
 
-void HachiServer::dispatch_message()
+void HachiServer::dispatch_server_handler()
 {
     int recv_size;
     char buffer[64];
-    string message;
 
     while ((recv_size = recv(_dispatch_server_socket, buffer, 64, 0)) > 0)
     {
@@ -66,17 +65,17 @@ void HachiServer::dispatch_send(const char* message, size_t size)
 
 void HachiServer::process_message(const char *message)
 {
-    REQUEST_LOGIN_INTERNAL request_login;
-    memcpy(&request_login, message, sizeof(REQUEST_LOGIN_INTERNAL));
+    REQUEST_LOGIN_INTERNAL request_login_internal;
+    memcpy(&request_login_internal, message, sizeof(REQUEST_LOGIN_INTERNAL));
 
-    cout << "[LOGIN] User: " << request_login.username <<  " " << request_login.session_id << endl;
+    cout << "[LOGIN] User: " << request_login_internal.username <<  " " << request_login_internal.session_id << endl;
 
-    RESPONSE_LOGIN login_response;
-    auto response_message = new char[sizeof(RESPONSE_LOGIN)];
-    login_response.session_id = request_login.session_id;
-    memcpy(static_cast<void*>(response_message), static_cast<void*>(&login_response), sizeof(RESPONSE_LOGIN));
+    RESPONSE_LOGIN_INTERNAL response_login_internal;
+    auto response_message = new char[sizeof(RESPONSE_LOGIN_INTERNAL)];
+    response_login_internal.session_id = request_login_internal.session_id;
+    memcpy(static_cast<void*>(response_message), static_cast<void*>(&response_login_internal), sizeof(RESPONSE_LOGIN_INTERNAL));
 
-    dispatch_send(response_message, sizeof(RESPONSE_LOGIN));
+    dispatch_send(response_message, sizeof(RESPONSE_LOGIN_INTERNAL));
 }
 
 int main(int argc, char *argv[])
